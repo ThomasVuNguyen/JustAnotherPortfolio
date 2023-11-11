@@ -1,5 +1,9 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,41 +36,52 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-
+  Future<void> _launchUrl() async {
+    final Uri _url = Uri.parse('https://github.com/ThomasVuNguyen');
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: Text("Nevin Jojo", style: GoogleFonts.publicSans(color: Colors.black, fontWeight: FontWeight.w400, fontSize: 24, fontStyle: FontStyle.normal )),
-      ),
-      body: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                  Flexible(
-                    flex: 8,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("I'm a software developer who builds immersive and user-friendly applications", style: TextStyle( fontWeight: FontWeight.w400, fontSize:24),),
-                        Text("Check out what books I'm reading, find me on Twitter/ Github/ LinkedIn, or just send me an email saying hi")
-                      ],
-                    ),
+      backgroundColor: Colors.cyanAccent,
+      body: Center(
+          child: FutureBuilder(
+            future: Future.delayed(const Duration(seconds: 2)),
+            builder: (c,s){
+              if (s.connectionState ==ConnectionState.done){
+                _launchUrl();
+                window.close();
+                SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/Ducky.gif'),
+                      SizedBox(height: 20,),
+                      Text("Enjoy!", style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 20),),
+                    ],
                   ),
-                Flexible(
-                  flex:2,
-                  child: Image.asset('assets/notion_avatar.png') ,
-                ),
-              ],
-            )
-          ],
-        ),
+                );
+
+              }
+              else{
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/Ducky.gif'),
+                      SizedBox(height: 20,),
+                      Text("Loading portfolio...",style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 20),),
+                    ],
+                  ),
+                );
+              }
+            }
+          )
       )
     );
   }
